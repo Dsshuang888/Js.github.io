@@ -1,508 +1,824 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>巨仕共创 - 代运营专用编辑器</title>
-    
-    <!-- 添加网站图标 -->
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="web-app-manifest-icon-192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="web-app-manifest-icon-512.png">
-    <link rel="manifest" href="site.webmanifest">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#5D5CDE',
-                        'primary-dark': '#4A49B8',
-                        'primary-light': '#7D7CE5'
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        .transition-all {
-            transition: all 0.3s ease;
-        }
-        .editor-height {
-            height: calc(100vh - 180px);
-        }
-        @media (max-width: 768px) {
-            .editor-height {
-                height: 40vh;
-            }
-        }
-    </style>
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <!-- 替换原有的favicon链接 -->
+   <link rel="icon" href="favicon.ico" type="image/x-icon">
+   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+   <link rel="apple-touch-icon" href="apple-touch-icon.png">
+   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+   <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+   <link rel="manifest" href="site.webmanifest">
+   <title>巨仕共创 - 代运营专用编辑器</title>
+   <!-- 其他头部元素保持不变 -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+   <!-- 引入Google字体 -->
+   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+   <style>
+       :root {
+           --primary-color: #4361ee; /* 更专业的蓝色 */
+           --secondary-color: #3a0ca3; /* 深紫色 */
+           --accent-color: #f72585; /* 亮粉色 */
+           --success-color: #4cc9f0; /* 成功色 */
+           --warning-color: #f8961e; /* 警告色 */
+           --text-color: #2b2d42; /* 更深的文本色 */
+           --text-light: #8d99ae; /* 浅色文本 */
+           --light-bg: #f8f9fa; /* 更柔和的背景色 */
+           --content-bg: #ffffff; /* 内容区背景色 */
+           --border-color: #e9ecef; /* 边框颜色 */
+           --border-radius: 12px; /* 增加圆角 */
+           --box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* 更精致的阴影 */
+           --transition: all 0.3s ease;
+       }
+       
+       /* 添加暗色模式变量 */
+       [data-theme="dark"] {
+           --primary-color: #4cc9f0;
+           --secondary-color: #7209b7;
+           --accent-color: #f72585;
+           --success-color: #4cc9f0;
+           --warning-color: #f8961e;
+           --text-color: #f8f9fa;
+           --text-light: #adb5bd;
+           --light-bg: #121212;
+           --content-bg: #1e1e1e;
+           --border-color: #2d3748;
+       }
+       
+       body, html {
+           font-family: 'Noto Sans SC', 'Helvetica Neue', Arial, sans-serif;
+           margin: 0;
+           padding: 0;
+           height: 100%;
+           background-color: var(--light-bg);
+           color: var(--text-color);
+           line-height: 1.6;
+       }
+       
+       .container {
+           max-width: 100%;
+           margin: 0 auto;
+           padding: 20px;
+           box-sizing: border-box;
+           height: 100%;
+           display: flex;
+           flex-direction: column;
+       }
+       
+       .header {
+           text-align: center;
+           padding: 25px 0;
+           margin-bottom: 30px;
+           position: relative;
+           background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+           border-radius: var(--border-radius);
+           color: white;
+           box-shadow: var(--box-shadow);
+           overflow: hidden;
+       }
+       
+       .header::before {
+           content: '';
+           position: absolute;
+           top: 0;
+           left: 0;
+           width: 100%;
+           height: 100%;
+           background: radial-gradient(circle at 20% 150%, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
+           pointer-events: none;
+       }
+       
+       .logo {
+           font-size: 32px;
+           font-weight: 700;
+           color: white;
+           margin: 0;
+           letter-spacing: 1px;
+           text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+       }
+       
+       .subtitle {
+           font-size: 16px;
+           color: rgba(255, 255, 255, 0.9);
+           margin-top: 8px;
+       }
+       
+       /* 添加主题切换按钮样式 */
+       .theme-toggle {
+           position: absolute;
+           top: 20px;
+           right: 20px;
+           background: rgba(255, 255, 255, 0.2);
+           border: none;
+           color: white;
+           font-size: 20px;
+           cursor: pointer;
+           z-index: 10;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           width: 40px;
+           height: 40px;
+           border-radius: 50%;
+           backdrop-filter: blur(5px);
+           transition: var(--transition);
+       }
+       
+       .theme-toggle:hover {
+           background-color: rgba(255, 255, 255, 0.3);
+           transform: rotate(30deg);
+       }
+       
+       .flex-container {
+           display: flex;
+           flex-direction: row;
+           gap: 25px;
+           height: calc(100% - 120px);
+       }
+
+       @media (max-width: 768px) {
+           .flex-container {
+               flex-direction: column;
+               height: auto;
+               gap: 15px;
+           }
+
+           .container {
+               padding: 10px;
+           }
+
+           .header {
+               padding: 15px 0;
+               margin-bottom: 20px;
+           }
+
+           .logo {
+               font-size: 24px;
+           }
+
+           .subtitle {
+               font-size: 14px;
+           }
+
+           .box {
+               padding: 15px;
+           }
+
+           .buttons-container {
+               gap: 8px;
+           }
+
+           button, .file-label {
+               padding: 8px 14px;
+               font-size: 13px;
+           }
+
+           #preview {
+               min-width: auto;
+           }
+
+           .theme-toggle {
+               width: 32px;
+               height: 32px;
+               font-size: 16px;
+               top: 10px;
+               right: 10px;
+           }
+       }
+       
+       .box {
+           background-color: var(--content-bg);
+           border-radius: var(--border-radius);
+           box-shadow: var(--box-shadow);
+           padding: 25px;
+           flex: 1;
+           min-width: 0;
+           display: flex;
+           flex-direction: column;
+           transition: var(--transition);
+           border: 1px solid var(--border-color);
+           position: relative;
+           overflow: hidden;
+       }
+       
+       .box::after {
+           content: '';
+           position: absolute;
+           top: 0;
+           left: 0;
+           width: 100%;
+           height: 5px;
+           background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+       }
+       
+       .box:hover {
+           box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+           transform: translateY(-3px);
+       }
+       
+       .box-header {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           margin-bottom: 20px;
+           border-bottom: 1px solid var(--border-color);
+           padding-bottom: 15px;
+       }
+       
+       .box-title {
+           margin: 0;
+           font-size: 20px;
+           font-weight: 600;
+           color: var(--primary-color);
+           display: flex;
+           align-items: center;
+       }
+       
+       /* 字数统计样式 */
+       .word-count {
+           font-size: 14px;
+           color: var(--text-light);
+           margin-left: auto;
+           padding: 4px 12px;
+           background-color: rgba(0, 0, 0, 0.05);
+           border-radius: 20px;
+           display: flex;
+           align-items: center;
+       }
+       
+       [data-theme="dark"] .word-count {
+           background-color: rgba(255, 255, 255, 0.1);
+       }
+       
+       .word-count::before {
+           content: '📊';
+           margin-right: 5px;
+           font-size: 14px;
+       }
+       
+       .box-title::before {
+           content: '';
+           display: inline-block;
+           width: 4px;
+           height: 20px;
+           background-color: var(--primary-color);
+           margin-right: 10px;
+           border-radius: 2px;
+       }
+       
+       .buttons-container {
+           display: flex;
+           flex-wrap: wrap;
+           gap: 12px;
+           margin-bottom: 20px;
+       }
+       
+       textarea, #preview {
+           width: auto;
+           flex-grow: 1;
+           border: 1px solid var(--border-color);
+           border-radius: var(--border-radius);
+           padding: 18px;
+           font-size: 15px;
+           line-height: 1.6;
+           color: var(--text-color);
+           resize: none;
+           overflow: auto;
+           transition: var(--transition);
+           background-color: var(--content-bg);
+       }
+       
+       textarea:focus {
+           outline: none;
+           border-color: var(--primary-color);
+           box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+       }
+       
+       #preview {
+           min-width: 480px;
+           max-width: 600px;
+           width: 100%;
+           overflow-x: auto;
+       }
+
+       @media (max-width: 768px) {
+           #preview {
+               min-width: 100%;
+               max-width: 100%;
+               font-size: 14px;
+           }
+
+           textarea {
+               min-height: 200px;
+               font-size: 14px;
+           }
+
+           .box-header {
+               flex-wrap: wrap;
+               gap: 10px;
+           }
+
+           .word-count {
+               font-size: 12px;
+               padding: 3px 10px;
+           }
+
+           .modal-content {
+               max-width: 90%;
+               margin: 50px auto;
+               padding: 20px;
+           }
+       }
+       
+       [data-theme="dark"] #preview {
+           color: var(--text-color);
+       }
+       
+       #preview img {
+           max-width: 100%;
+           height: auto;
+           border-radius: 8px;
+           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+       }
+       
+       #preview p {
+           margin: 0.8em 0;
+           line-height: 1.6;
+       }
+       
+       #preview br {
+           line-height: 1.2;
+           margin: 0;
+           padding: 0;
+       }
+       
+       /* 微信公众号兼容的代码块样式 */
+       #preview pre {
+           background-color: #f8f9fa;
+           padding: 20px;
+           border-radius: 10px;
+           margin: 1.2em 0;
+           position: relative;
+           font-size: 14px;
+           color: #333;
+           line-height: 1.6;
+           overflow-x: auto;
+           border-left: 4px solid var(--primary-color);
+       }
+       
+       [data-theme="dark"] #preview pre {
+           background-color: #2d3748;
+           color: #e2e8f0;
+       }
+       
+       #preview pre code {
+           display: block;
+           font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+           background: transparent;
+       }
+       
+       /* 行内代码样式 */
+       #preview code:not([class]) {
+           background-color: #f1f3f5;
+           padding: 3px 6px;
+           border-radius: 4px;
+           color: #e74c3c;
+           font-family: 'Fira Code', Consolas, Monaco, monospace;
+           font-size: 0.9em;
+       }
+       
+       [data-theme="dark"] #preview code:not([class]) {
+           background-color: #2d3748;
+           color: #f87171;
+       }
+       
+       /* 按钮样式优化 */
+       button, .file-label {
+           background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+           color: white;
+           border: none;
+           padding: 10px 18px;
+           border-radius: 50px;
+           cursor: pointer;
+           font-size: 14px;
+           font-weight: 500;
+           transition: var(--transition);
+           display: inline-flex;
+           align-items: center;
+           justify-content: center;
+           box-shadow: 0 4px 10px rgba(67, 97, 238, 0.2);
+           position: relative;
+           overflow: hidden;
+           z-index: 1;
+       }
+       
+       button::before, .file-label::before {
+           content: '';
+           position: absolute;
+           top: 0;
+           left: -100%;
+           width: 100%;
+           height: 100%;
+           background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+           transition: 0.5s;
+           z-index: -1;
+       }
+       
+       button:hover::before, .file-label:hover::before {
+           left: 100%;
+       }
+       
+       button:hover, .file-label:hover {
+           transform: translateY(-3px);
+           box-shadow: 0 6px 15px rgba(67, 97, 238, 0.3);
+       }
+       
+       button:active, .file-label:active {
+           transform: translateY(1px);
+       }
+       
+       #tutorialButton {
+           background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+           box-shadow: 0 4px 10px rgba(247, 37, 133, 0.2);
+       }
+       
+       #renderHtmlButton {
+           background: linear-gradient(135deg, var(--success-color), var(--primary-color));
+           box-shadow: 0 4px 10px rgba(76, 201, 240, 0.2);
+       }
+       
+       /* 复制成功提示样式 */
+       .copy-toast {
+           position: fixed;
+           bottom: 30px;
+           left: 50%;
+           transform: translateX(-50%);
+           background-color: rgba(0, 0, 0, 0.8);
+           color: white;
+           padding: 12px 24px;
+           border-radius: 30px;
+           font-size: 14px;
+           z-index: 1000;
+           opacity: 0;
+           transition: opacity 0.3s;
+           backdrop-filter: blur(5px);
+       }
+       
+       .copy-toast.show {
+           opacity: 1;
+       }
+       
+       /* 模态框样式优化 */
+       .modal {
+           display: none;
+           position: fixed;
+           top: 0;
+           left: 0;
+           width: 100%;
+           height: 100%;
+           background-color: rgba(0,0,0,0.5);
+           z-index: 1000;
+           backdrop-filter: blur(5px);
+       }
+       
+       .modal-content {
+           position: relative;
+           background-color: var(--content-bg);
+           max-width: 350px;
+           margin: 100px auto;
+           padding: 30px;
+           border-radius: var(--border-radius);
+           text-align: center;
+           box-shadow: var(--box-shadow);
+           animation: modalFadeIn 0.3s;
+       }
+       
+       [data-theme="dark"] .modal-content {
+           background-color: var(--content-bg);
+           color: var(--text-color);
+       }
+   </style>
 </head>
-<body class="bg-white dark:bg-gray-900 transition-all">
-    <div class="min-h-screen">
-        <!-- Header -->
-        <header class="bg-primary dark:bg-primary-dark text-white p-4 shadow-md">
-            <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
-                <div class="flex items-center space-x-2 mb-3 md:mb-0">
-                    <i class="fas fa-edit text-2xl"></i>
-                    <h1 class="text-xl md:text-2xl font-bold">巨仕共创 - 代运营专用编辑器</h1>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <button id="wechatBtn" class="bg-green-500 hover:bg-green-600 text-white rounded-lg px-3 py-1.5 text-sm font-medium transition-all flex items-center shadow-sm">
-                        <i class="fab fa-weixin mr-1"></i> 点击加微信
-                    </button>
-                    <button id="themeToggle" class="bg-white text-primary hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 rounded-full p-2 transition-all shadow-sm">
-                        <i class="fas fa-moon dark:hidden"></i>
-                        <i class="fas fa-sun hidden dark:inline"></i>
-                    </button>
-                </div>
-            </div>
-        </header>
-        
-        <!-- Main Content -->
-        <main class="container mx-auto p-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Original Text Panel -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-                    <div class="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 p-4 flex justify-between items-center">
-                        <h2 class="text-lg font-medium text-gray-800 dark:text-white">原文本</h2>
-                        <div class="flex space-x-2">
-                            <button id="restoreHtmlBtn" class="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-3 py-1.5 text-sm font-medium transition-all shadow-sm">
-                                <i class="fas fa-code mr-1"></i> 还原HTML
-                            </button>
-                            <button id="importFileBtn" class="bg-amber-500 hover:bg-amber-600 text-white rounded-lg px-3 py-1.5 text-sm font-medium transition-all shadow-sm">
-                                <i class="fas fa-file-import mr-1"></i> 导入文件
-                            </button>
-                            <input type="file" id="fileInput" class="hidden" accept=".txt,.html,.htm">
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <textarea id="originalText" class="w-full editor-height px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-700 dark:text-white text-base" placeholder="请在此输入原文本..."></textarea>
-                    </div>
-                </div>
-                
-                <!-- Preview Panel -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-                    <div class="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <h2 class="text-lg font-medium text-gray-800 dark:text-white">预览</h2>
-                            <div class="flex items-center space-x-2">
-                                <div class="flex items-center mr-2">
-                                    <input type="checkbox" id="clearAfterCopy" class="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                    <label for="clearAfterCopy" class="ml-2 text-sm font-medium text-gray-600 dark:text-gray-400">复制后清空原文本</label>
-                                </div>
-                                <button id="copyPreviewBtn" class="bg-primary hover:bg-primary-dark text-white rounded-lg px-3 py-1.5 text-sm font-medium transition-all shadow-sm">
-                                    <i class="fas fa-copy mr-1"></i> 复制预览内容
-                                </button>
-                            </div>
-                        </div>
-                        <div id="characterCount" class="flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-4">
-                            <div class="flex items-center">
-                                <i class="fas fa-text-width mr-1.5"></i>
-                                <span><span id="charCount">0</span> 个字符</span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-align-left mr-1.5"></i>
-                                <span><span id="wordCount">0</span> 个词</span>
-                            </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-paragraph mr-1.5"></i>
-                                <span><span id="lineCount">0</span> 行</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <div id="previewContent" class="w-full editor-height p-4 border border-gray-200 dark:border-gray-600 rounded-lg overflow-auto dark:bg-gray-700 dark:text-white" contenteditable="false"></div>
-                    </div>
-                </div>
-            </div>
-        </main>
-        
-        <!-- Footer -->
-        <footer class="mt-8 py-4 text-center text-gray-600 dark:text-gray-400 text-sm">
-            <p>© 2025 巨仕共创. All rights reserved.</p>
-        </footer>
-    </div>
-    
-    <!-- Modal -->
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full mx-4">
-            <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-medium text-gray-800 dark:text-white">微信联系方式</h3>
-                <button id="closeModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="p-6 text-center">
-                <div class="flex justify-center items-center mb-4">
-                    <p class="text-xl font-bold text-gray-800 dark:text-white">微信：</p>
-                    <p id="wechatId" class="text-xl font-bold text-gray-800 dark:text-white ml-1">Jscm888-</p>
-                    <button id="copyWechatBtn" class="ml-3 bg-green-500 hover:bg-green-600 text-white rounded-lg px-3 py-1 text-sm font-medium transition-all shadow-sm">
-                        <i class="fas fa-copy mr-1"></i> 复制
-                    </button>
-                </div>
-                <div class="bg-green-100 dark:bg-green-900 p-5 rounded-lg inline-block mb-4">
-                    <i class="fab fa-weixin text-6xl text-green-600 dark:text-green-400"></i>
-                </div>
-                <p class="text-gray-600 dark:text-gray-400">扫描添加或搜索微信号进行联系</p>
-            </div>
-        </div>
-    </div>
-    
-    <script>
-        // Check for dark mode preference
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-        }
-        
-        // DOM elements
-        const originalText = document.getElementById('originalText');
-        const previewContent = document.getElementById('previewContent');
-        const restoreHtmlBtn = document.getElementById('restoreHtmlBtn');
-        const importFileBtn = document.getElementById('importFileBtn');
-        const fileInput = document.getElementById('fileInput');
-        const copyPreviewBtn = document.getElementById('copyPreviewBtn');
-        const wechatBtn = document.getElementById('wechatBtn');
-        const modal = document.getElementById('modal');
-        const closeModal = document.getElementById('closeModal');
-        const themeToggle = document.getElementById('themeToggle');
-        
-        // Flag to track if HTML has been restored
-        let isHtmlRestored = false;
-        
-        // Update character count as user types, but don't show in preview
-        originalText.addEventListener('input', () => {
-            // Keep the preview empty until "还原HTML" is clicked
-            if (!isHtmlRestored) {
-                previewContent.textContent = '';
-                // When HTML is not yet restored, count stats from the original text
-                updateCharacterCount();
-            }
-        });
-        
-        function updatePreview() {
-            // Only called when HTML is restored or file is imported
-            if (isHtmlRestored) {
-                previewContent.innerHTML = originalText.value;
-            } else {
-                previewContent.textContent = '';
-            }
-            // Always update the character count
-            updateCharacterCount();
-        }
-        
-        // Update character count statistics based on preview content or original text
-        function updateCharacterCount() {
-            // Get content from preview if HTML has been restored, otherwise from original text
-            let content;
-            
-            if (isHtmlRestored && previewContent.textContent) {
-                // If HTML is restored, count from the preview content (text only, not HTML)
-                content = previewContent.textContent;
-            } else {
-                // Otherwise count from original text
-                content = originalText.value || '';
-            }
-            
-            const charCount = document.getElementById('charCount');
-            const wordCount = document.getElementById('wordCount');
-            const lineCount = document.getElementById('lineCount');
-            
-            // Count characters (including spaces)
-            charCount.textContent = content.length;
-            
-            // Count words (split by whitespace and filter empty strings)
-            const words = content.trim().split(/\s+/).filter(word => word.length > 0);
-            wordCount.textContent = words.length;
-            
-            // Count lines (split by newline)
-            const lines = content.split(/\r\n|\r|\n/);
-            lineCount.textContent = content.length > 0 ? lines.length : 0;
-        }
-        
-        // Enhanced Restore HTML button functionality
-        restoreHtmlBtn.addEventListener('click', () => {
-            try {
-                // Create a temporary div to parse the HTML
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = originalText.value.trim();
-                
-                // Format and beautify the HTML
-                const formattedHtml = formatHTML(tempDiv.innerHTML);
-                
-                // Update the original text with the formatted HTML
-                originalText.value = formattedHtml;
-                
-                // Configure the preview to show and render HTML content
-                // This will properly load and display images
-                previewContent.srcdoc = originalText.value;
-                previewContent.innerHTML = originalText.value;
-                
-                // Update character count
-                updateCharacterCount();
-                
-                // Set flag to indicate HTML has been restored
-                isHtmlRestored = true;
-                
-                showToast('HTML已成功还原并格式化！');
-            } catch (e) {
-                console.error('HTML parsing error:', e);
-                showToast('HTML解析错误，请检查格式！', 'error');
-            }
-        });
-        
-        // HTML formatter function
-        function formatHTML(html) {
-            let formatted = '';
-            let indent = '';
-            
-            // Helper function to determine if tag is self-closing
-            const isSelfClosing = (tag) => {
-                const selfClosingTags = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 
-                                        'link', 'meta', 'param', 'source', 'track', 'wbr'];
-                return selfClosingTags.includes(tag.toLowerCase());
-            };
-            
-            // Split HTML into individual characters
-            const chars = html.trim().split('');
-            let inTag = false;
-            let inComment = false;
-            let inContent = false;
-            let currentTag = '';
-            let currentContent = '';
-            
-            for (let i = 0; i < chars.length; i++) {
-                const char = chars[i];
-                
-                // Check for comments
-                if (i + 3 < chars.length && char === '<' && chars[i + 1] === '!' && chars[i + 2] === '-' && chars[i + 3] === '-') {
-                    inComment = true;
-                    formatted += '\n' + indent + '<!-- ';
-                    i += 3;
-                    continue;
-                }
-                
-                if (inComment && i + 2 < chars.length && char === '-' && chars[i + 1] === '-' && chars[i + 2] === '>') {
-                    inComment = false;
-                    formatted += ' -->';
-                    i += 2;
-                    continue;
-                }
-                
-                if (inComment) {
-                    formatted += char;
-                    continue;
-                }
-                
-                // Handle tag opening and closing
-                if (char === '<' && !inTag) {
-                    // If there was content before this tag, add it properly
-                    if (currentContent.trim().length > 0) {
-                        formatted += currentContent.trim();
-                        currentContent = '';
-                    }
-                    
-                    inTag = true;
-                    currentTag = '';
-                    formatted += '\n' + indent;
-                    formatted += char;
-                    
-                    // Check if it's a closing tag
-                    if (i + 1 < chars.length && chars[i + 1] === '/') {
-                        indent = indent.slice(2); // Decrease indentation for closing tags
-                    }
-                } else if (char === '>' && inTag) {
-                    inTag = false;
-                    inContent = true;
-                    currentTag = currentTag.trim();
-                    
-                    // Check for self-closing or void elements
-                    if (currentTag.endsWith('/') || isSelfClosing(currentTag.split(' ')[0])) {
-                        // Don't change indentation for self-closing tags
-                    } else if (!currentTag.startsWith('/')) {
-                        // Increase indentation for opening tags that aren't self-closing
-                        indent += '  ';
-                    }
-                    
-                    formatted += char;
-                    currentTag = '';
-                } else if (inTag) {
-                    currentTag += char;
-                    formatted += char;
-                } else if (inContent) {
-                    // Collect content to preserve whitespace within content
-                    currentContent += char;
-                }
-            }
-            
-            return formatted;
-        }
-        
-        // Import file button functionality
-        importFileBtn.addEventListener('click', () => {
-            fileInput.click();
-        });
-        
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                originalText.value = e.target.result;
-                updatePreview();
-            };
-            reader.readAsText(file);
-        });
-        
-        // Copy preview button functionality with optional clearing
-        copyPreviewBtn.addEventListener('click', () => {
-            // Check if there's content to copy
-            if (!isHtmlRestored && originalText.value.trim() === '') {
-                showToast('没有内容可复制！', 'warning');
-                return;
-            }
-            
-            try {
-                // Create a temporary range and selection
-                const range = document.createRange();
-                range.selectNodeContents(previewContent);
-                
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
-                
-                // Execute copy command on the selected content
-                document.execCommand('copy');
-                
-                // Clear the selection
-                selection.removeAllRanges();
-                
-                // Check if the "clear after copy" checkbox is checked
-                const clearAfterCopy = document.getElementById('clearAfterCopy');
-                if (clearAfterCopy.checked) {
-                    // Store the current preview content before clearing
-                    const previousPreviewContent = previewContent.innerHTML;
-                    
-                    // Clear original text
-                    originalText.value = '';
-                    
-                    // If HTML was restored, preserve the HTML view in preview
-                    if (isHtmlRestored) {
-                        previewContent.innerHTML = previousPreviewContent;
-                    } else {
-                        updatePreview(); // Updates preview to blank
-                    }
-                    
-                    showToast('已复制预览内容并清空原文本！');
-                } else {
-                    showToast('预览内容已复制到剪贴板！');
-                }
-            } catch (err) {
-                console.error('Copy failed:', err);
-                
-                // Fallback method if the selection method fails
-                const contentToCopy = previewContent.innerText || previewContent.textContent;
-                copyToClipboard(contentToCopy);
-                
-                // Check if the "clear after copy" checkbox is checked
-                const clearAfterCopy = document.getElementById('clearAfterCopy');
-                if (clearAfterCopy.checked) {
-                    // Store the current preview content before clearing
-                    const previousPreviewContent = previewContent.innerHTML;
-                    
-                    // Clear original text
-                    originalText.value = '';
-                    
-                    // If HTML was restored, preserve the HTML view in preview
-                    if (isHtmlRestored) {
-                        previewContent.innerHTML = previousPreviewContent;
-                    } else {
-                        updatePreview(); // Updates preview to blank
-                    }
-                    
-                    showToast('已复制预览内容并清空原文本！');
-                } else {
-                    showToast('预览内容已复制到剪贴板！');
-                }
-            }
-        });
-        
-        // WeChat button and modal functionality
-        wechatBtn.addEventListener('click', () => {
-            modal.classList.remove('hidden');
-        });
-        
-        closeModal.addEventListener('click', () => {
-            modal.classList.add('hidden');
-        });
-        
-        // Copy WeChat ID functionality
-        document.getElementById('copyWechatBtn').addEventListener('click', () => {
-            const wechatId = document.getElementById('wechatId').textContent;
-            copyToClipboard(wechatId);
-            showToast('微信号已复制到剪贴板！', 'info');
-        });
-        
-        // Theme toggle functionality
-        themeToggle.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-        });
-        
-        // Click outside modal to close
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.add('hidden');
-            }
-        });
-        
-        // Copy to clipboard helper function
-        function copyToClipboard(text) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-        }
-        
-        // Enhanced Toast notification helper
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            let bgColor = 'bg-primary';
-            let icon = '<i class="fas fa-check-circle mr-2"></i>';
-            
-            if (type === 'error') {
-                bgColor = 'bg-red-500';
-                icon = '<i class="fas fa-exclamation-circle mr-2"></i>';
-            } else if (type === 'warning') {
-                bgColor = 'bg-yellow-500';
-                icon = '<i class="fas fa-exclamation-triangle mr-2"></i>';
-            } else if (type === 'info') {
-                bgColor = 'bg-blue-500';
-                icon = '<i class="fas fa-info-circle mr-2"></i>';
-            }
-            
-            toast.className = `fixed bottom-4 right-4 ${bgColor} text-white px-4 py-3 rounded-lg shadow-lg transition-all transform translate-y-0 opacity-100 flex items-center z-50`;
-            toast.innerHTML = `${icon} <span>${message}</span>`;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => document.body.removeChild(toast), 300);
-            }, 3000);
-        }
-        
-        // Initialize preview and character count on page load
-        updatePreview();
-        
-        // Make sure character statistics are updated when HTML is restored or file is imported
-        restoreHtmlBtn.addEventListener('click', () => setTimeout(updateCharacterCount, 100));
-        fileInput.addEventListener('change', () => setTimeout(updateCharacterCount, 100));
-    </script>
+<body>
+   <div class="container">
+       <div class="header">
+           <h1 class="logo">巨仕共创</h1>
+           <p class="subtitle">代运营专用编辑器</p>
+           <button class="theme-toggle" id="themeToggle">🌙</button>
+       </div>
+       
+       <div class="flex-container">
+           <div class="box">
+               <div class="box-header">
+                   <h3 class="box-title">原文本</h3>
+               </div>
+               <div class="buttons-container">
+                   <button id="tutorialButton" onclick="openTutorial()">👋 添加微信</button>
+                   <button id="renderHtmlButton" onclick="renderHtml()">🔄 还原HTML</button>
+                   <label for="fileInput" class="file-label">📂 导入文件</label>
+                   <input type="file" id="fileInput" accept=".txt, .md" style="display: none;">
+               </div>
+               <textarea id="originalText" placeholder="在此处输入您的文本..."></textarea>
+           </div>
+           <div class="box">
+               <div class="box-header">
+                   <h3 class="box-title">预览</h3>
+                   <span class="word-count" id="wordCount">0 字</span>
+               </div>
+               <div class="buttons-container">
+                   <button onclick="copyPreviewContent()">📋 复制预览内容</button>
+                   <div class="checkbox-container">
+                       <input type="checkbox" id="clearCheckbox">
+                       <label for="clearCheckbox">复制后清空原文本</label>
+                   </div>
+               </div>
+               <div id="preview" contenteditable="true"></div>
+           </div>
+       </div>
+   </div>
 
+   <div id="qrModal" class="modal">
+       <div class="modal-content">
+           <span class="close-button" onclick="closeModal()">&times;</span>
+           <img id="qrCode" src="" class="qr-image">
+           <p class="contact-info">微信：<span id="wxid">Jscm888-</span></p>
+           <button onclick="copyWechatId()" class="file-label" style="margin-top: 10px;">复制微信号</button>
+       </div>
+   </div>
+   
+   <div class="copy-toast" id="copyToast">复制成功!</div>
 
-</body></html>
+   <script>
+       const originalText = document.getElementById('originalText');
+       const preview = document.getElementById('preview');
+       const fileInput = document.getElementById('fileInput');
+
+       fileInput.addEventListener('change', async (event) => {
+           const file = event.target.files[0];
+           if (file) {
+               const reader = new FileReader();
+               if (file.type === "text/plain") {
+                   reader.onload = () => {
+                       originalText.value = reader.result;
+                       convertToHtml();
+                   };
+                   reader.readAsText(file);
+               } else if (file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+                   const arrayBuffer = await file.arrayBuffer();
+                   const text = await extractTextFromWord(arrayBuffer);
+                   originalText.value = text;
+                   convertToHtml();
+               }
+           }
+       });
+
+       function convertPunctuation(text) {
+           const punctuationMap = {
+               ',': '，',
+               '.': '。',
+               '?': '？',
+               '!': '！',
+               ':': '：',
+               ';': '；',
+               '(': '（',
+               ')': '）',
+               '[': '【',
+               ']': '】',
+               '{': '｛',
+               '}': '｝'
+           };
+           
+           let quoteCount = 0;
+           
+           return text.replace(/[,.?!:;()\[\]{}]|"|'/g, match => {
+               if (match === '"' || match === "'") {
+                   quoteCount++;
+                   return quoteCount % 2 === 1 ? '"' : '"';
+               }
+               return punctuationMap[match] || match;
+           });
+       }
+
+       function convertToHtml() {
+           const text = originalText.value;
+           const convertedText = convertPunctuation(text);
+           
+           let html = convertedText
+               .replace(/```(\w*)\n([\s\S]*?)```/g, (match, language, code) => {
+                   const processedCode = code.trim()
+                       .replace(/&/g, '&amp;')
+                       .replace(/</g, '&lt;')
+                       .replace(/>/g, '&gt;')
+                       .replace(/"/g, '&quot;')
+                       .replace(/'/g, '&#039;');
+                   return `<pre><code class="language-${language}">${processedCode}</code></pre>`;
+               })
+               .replace(/`([^`]+)`/g, '<code>$1</code>')
+               .replace(/\n/g, '<br style="line-height: 1.2; margin: 0; padding: 0;">')
+               .replace(/\*/g, '')
+               .replace(/#([^#\n]+)/g, '<span style="color: #000; font-weight: bold;">#$1</span>')
+               .replace(/🌙|✨|😍|🎉|💖|👍|🛒/g, match => `<span style="font-size: 1.2em;">${match}</span>`);
+           
+           preview.innerHTML = html;
+
+           // 更新字数统计
+           updateWordCount();
+
+           const codeBlocks = preview.getElementsByTagName('code');
+           for (let block of codeBlocks) {
+               if (block.className.includes('language-')) {
+                   hljs.highlightElement(block);
+               }
+           }
+       }
+       
+       // 添加字数统计函数
+       function updateWordCount() {
+           const text = preview.textContent || '';
+           const count = text.trim().length;
+           document.getElementById('wordCount').textContent = `${count} 字`;
+       }
+       
+       function renderHtml() {
+           const text = originalText.value;
+           const processedText = text.replace(/<\/p>\s*<br\s*\/?>/g, '</p>').replace(/<\/ul>\s*<br\s*\/?>/g, '</ul>');
+           preview.innerHTML = processedText;
+           
+           preview.style.fontSize = '17px';
+           preview.style.lineHeight = '1.6';
+           
+           const elements = preview.getElementsByTagName('*');
+           for (let i = 0; i < elements.length; i++) {
+               const element = elements[i];
+               const computedStyle = window.getComputedStyle(element);
+               
+               if (computedStyle.fontSize === preview.style.fontSize) {
+                   element.style.fontSize = '17px';
+               }
+               
+               if (element.tagName.toLowerCase() === 'p') {
+                   element.style.margin = '0.8em 0';
+                   element.style.padding = '0';
+                   element.style.lineHeight = '1.6';
+               }
+           }
+
+           const codeBlocks = preview.getElementsByTagName('code');
+           for (let block of codeBlocks) {
+               if (block.className.includes('language-')) {
+                   hljs.highlightElement(block);
+               }
+           }
+           
+           // 更新字数统计
+           updateWordCount();
+       }
+       
+       // 添加主题切换功能
+       const themeToggle = document.getElementById('themeToggle');
+       const htmlElement = document.documentElement;
+       
+       // 检查本地存储中的主题设置
+       const savedTheme = localStorage.getItem('theme');
+       if (savedTheme) {
+           htmlElement.setAttribute('data-theme', savedTheme);
+           updateThemeIcon(savedTheme);
+       }
+       
+       themeToggle.addEventListener('click', () => {
+           const currentTheme = htmlElement.getAttribute('data-theme') || 'light';
+           const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+           
+           htmlElement.setAttribute('data-theme', newTheme);
+           localStorage.setItem('theme', newTheme);
+           
+           updateThemeIcon(newTheme);
+       });
+       
+       function updateThemeIcon(theme) {
+           themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+       }
+       
+       // 添加复制微信号功能
+       function copyWechatId() {
+           const wxid = document.getElementById('wxid').textContent;
+           navigator.clipboard.writeText(wxid).then(() => {
+               showCopyToast('微信号已复制!');
+           }).catch(err => {
+               console.error('复制失败:', err);
+               
+               // 备用复制方法
+               const range = document.createRange();
+               range.selectNode(document.getElementById('wxid'));
+               const selection = window.getSelection();
+               selection.removeAllRanges();
+               selection.addRange(range);
+               
+               try {
+                   document.execCommand('copy');
+                   showCopyToast('微信号已复制!');
+               } catch (err) {
+                   console.error('复制失败:', err);
+               }
+               
+               selection.removeAllRanges();
+           });
+       }
+       
+       function showCopyToast(message) {
+           const toast = document.getElementById('copyToast');
+           toast.textContent = message;
+           toast.classList.add('show');
+           
+           setTimeout(() => {
+               toast.classList.remove('show');
+           }, 2000);
+       }
+       
+       // 修改复制预览内容函数，添加提示
+       function copyPreviewContent() {
+           const range = document.createRange();
+           range.selectNodeContents(preview);
+           const selection = window.getSelection();
+           selection.removeAllRanges();
+           selection.addRange(range);
+           
+           try {
+               document.execCommand('copy');
+               if (clearCheckbox.checked) {
+                   originalText.value = ''; // 只清空原文本
+               }
+               showCopyToast('预览内容已复制!');
+           } catch (err) {
+               console.error('复制失败:', err);
+           }
+           
+           selection.removeAllRanges();
+       }
+
+       const savedCheckboxState = localStorage.getItem('clearCheckboxState');
+       clearCheckbox.checked = savedCheckboxState === 'true';
+
+       clearCheckbox.addEventListener('change', function() {
+           localStorage.setItem('clearCheckboxState', this.checked);
+       });
+       
+       function openTutorial() {
+           document.getElementById('qrModal').style.display = 'block';
+           document.getElementById('qrCode').src = 'https://example.com/qrcode.png'; // 这里需要替换为实际的二维码图片
+       }
+
+       function closeModal() {
+           document.getElementById('qrModal').style.display = 'none';
+       }
+
+       document.getElementById('qrModal').addEventListener('click', function(event) {
+           if (event.target === this) {
+               closeModal();
+           }
+       });
+       
+       function renderHtml() {
+           const text = originalText.value;
+           const processedText = text.replace(/<\/p>\s*<br\s*\/?>/g, '</p>').replace(/<\/ul>\s*<br\s*\/?>/g, '</ul>');
+           preview.innerHTML = processedText;
+           
+           preview.style.fontSize = '17px';
+           preview.style.lineHeight = '1.6';
+           
+           const elements = preview.getElementsByTagName('*');
+           for (let i = 0; i < elements.length; i++) {
+               const element = elements[i];
+               const computedStyle = window.getComputedStyle(element);
+               
+               if (computedStyle.fontSize === preview.style.fontSize) {
+                   element.style.fontSize = '17px';
+               }
+               
+               if (element.tagName.toLowerCase() === 'p') {
+                   element.style.margin = '0.8em 0';
+                   element.style.padding = '0';
+                   element.style.lineHeight = '1.6';
+               }
+           }
+
+           const codeBlocks = preview.getElementsByTagName('code');
+           for (let block of codeBlocks) {
+               if (block.className.includes('language-')) {
+                   hljs.highlightElement(block);
+               }
+           }
+       }
+
+       originalText.addEventListener('input', convertToHtml);
+       
+       hljs.configure({
+           languages: ['python', 'javascript', 'html', 'css', 'java', 'cpp']
+       });
+       
+       convertToHtml();
+   </script>
+</body>
+</html>
